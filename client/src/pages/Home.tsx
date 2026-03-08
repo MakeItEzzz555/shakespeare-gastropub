@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight, MapPin, Phone, Mail, Facebook, Download } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { MapView } from "@/components/Map";
 
 /**
  * Shakespeare Gastropub - Modernized Website
@@ -13,6 +14,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [currentMenuSlide, setCurrentMenuSlide] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const mapRef = useRef<google.maps.Map | null>(null);
 
   const menuImages = [
     {
@@ -63,30 +65,46 @@ export default function Home() {
       >
         <div className="container flex items-center justify-between py-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-display font-bold text-lg">S</span>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+              scrolled ? "bg-primary" : "bg-white/20 backdrop-blur-sm"
+            }`}>
+              <span className={`font-display font-bold text-lg transition-colors duration-300 ${
+                scrolled ? "text-primary-foreground" : "text-white"
+              }`}>S</span>
             </div>
             <div>
-              <h1 className="font-display font-bold text-primary text-lg">Shakespeare</h1>
-              <p className="text-xs text-muted-foreground">British Gastropub</p>
+              <h1 className={`font-display font-bold text-lg transition-colors duration-300 ${
+                scrolled ? "text-primary" : "text-white"
+              }`}>Shakespeare</h1>
+              <p className={`text-xs transition-colors duration-300 ${
+                scrolled ? "text-muted-foreground" : "text-white/70"
+              }`}>British Gastropub</p>
             </div>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#about" className="text-foreground hover:text-primary transition-colors">
+            <a href="#about" className={`transition-colors duration-300 ${
+              scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-accent"
+            }`}>
               About
             </a>
-            <a href="#menu" className="text-foreground hover:text-primary transition-colors">
+            <a href="#menu" className={`transition-colors duration-300 ${
+              scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-accent"
+            }`}>
               Menu
             </a>
-            <a href="#contact" className="text-foreground hover:text-primary transition-colors">
+            <a href="#contact" className={`transition-colors duration-300 ${
+              scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-accent"
+            }`}>
               Contact
             </a>
             <a
               href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground hover:text-primary transition-colors"
+              className={`transition-colors duration-300 ${
+                scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-accent"
+              }`}
             >
               <Facebook size={20} />
             </a>
@@ -284,6 +302,26 @@ export default function Home() {
         <div className="container">
           <h2 className="section-title text-center mb-12">Get in Touch</h2>
           <div className="section-divider mx-auto max-w-xs mb-12"></div>
+
+          {/* Google Maps */}
+          <div className="max-w-4xl mx-auto mb-12 rounded-lg overflow-hidden shadow-lg">
+            <MapView
+              initialCenter={{ lat: 34.6749, lng: 33.0449 }}
+              initialZoom={15}
+              onMapReady={(map) => {
+                mapRef.current = map;
+                // Add marker for restaurant location
+                if (window.google) {
+                  new window.google.maps.marker.AdvancedMarkerElement({
+                    map,
+                    position: { lat: 34.6749, lng: 33.0449 },
+                    title: "Shakespeare Gastropub",
+                  });
+                }
+              }}
+              className="h-96 rounded-lg"
+            />
+          </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
             {/* Phone */}
